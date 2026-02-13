@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteca Universitaria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="container mt-5">
+
+    <h1 class="text-center mb-4">Sistema de Biblioteca Universitaria</h1>
+
+    <div class="card p-4 mb-4">
+        <h4>Agregar Nuevo Libro</h4>
+
+        <form id="formLibro">
+            <div class="row mb-2">
+                <div class="col">
+                    <input type="text" id="titulo" class="form-control" placeholder="Título" required>
+                </div>
+                <div class="col">
+                    <input type="text" id="autor" class="form-control" placeholder="Autor" required>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col">
+                    <input type="text" id="categoria" class="form-control" placeholder="Categoría" required>
+                </div>
+                <div class="col">
+                    <input type="number" id="anio" class="form-control" placeholder="Año" required>
+                </div>
+                <div class="col">
+                    <input type="number" id="cantidad" class="form-control" placeholder="Cantidad Disponible" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Agregar Libro</button>
+        </form>
+    </div>
+
+    <h4>Listado de Libros</h4>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Categoría</th>
+                <th>Año</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody id="tablaLibros"></tbody>
+    </table>
+
+<script>
+
+function cargarLibros() {
+    fetch('http://localhost:3000/libros')
+    .then(response => response.json())
+    .then(data => {
+        let tabla = document.getElementById('tablaLibros');
+        tabla.innerHTML = "";
+
+        data.forEach(libro => {
+            tabla.innerHTML += `
+                <tr>
+                    <td>${libro.id_libro}</td>
+                    <td>${libro.titulo}</td>
+                    <td>${libro.autor}</td>
+                    <td>${libro.categoria}</td>
+                    <td>${libro.anio_publicacion}</td>
+                    <td>${libro.cantidad_disponible}</td>
+                </tr>
+            `;
+        });
+    })
+    .catch(error => console.error('Error:', error));
+}
+document.getElementById("formLibro").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const nuevoLibro = {
+        titulo: document.getElementById("titulo").value,
+        autor: document.getElementById("autor").value,
+        categoria: document.getElementById("categoria").value,
+        anio_publicacion: document.getElementById("anio").value,
+        cantidad_disponible: document.getElementById("cantidad").value
+    };
+
+    fetch("http://localhost:3000/libros", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(nuevoLibro)
+    })
+    .then(res => res.text())
+    .then(data => {
+        alert(data);
+        document.getElementById("formLibro").reset();
+        cargarLibros();
+    })
+    .catch(err => console.error(err));
+});
+
+cargarLibros();
+
+</script>
+
+</body>
+</html>
